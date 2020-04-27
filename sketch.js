@@ -65,7 +65,7 @@ function draw() {
   modulator.freq(modFreq);
 
   let modAmp = map(mouseX, 0, width, 0, 1);
-  modulator.amp(modAmpf, 0.01); // fade time of 0.1 for smooth fading
+  modulator.amp(modAmp, 0.01); // fade time of 0.1 for smooth fading
 
   // analyze the waveform
   waveform = fft.waveform();
