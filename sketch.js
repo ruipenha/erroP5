@@ -30,12 +30,54 @@
 let carrier; // this is the oscillator we will hear
 let modulator; // this oscillator will modulate the amplitude of the carrier
 let fft; // we'll visualize the waveform
+let audioStarted = false;
 
 function setup() {
   createCanvas(800, 400);
   noFill();
   background(30); // alpha
+}
 
+function draw() {
+  background(30, 30, 30, 100); // alpha
+  if(audioStarted) {
+
+    // map mouseY to moodulator freq between 0 and 20hz
+    let modFreq = map(mouseY, 0, height, 20, 0);
+    modulator.freq(modFreq);
+
+    let modAmp = map(mouseX, 0, width, 0, 1);
+    modulator.amp(modAmp, 0.01); // fade time of 0.1 for smooth fading
+
+    // analyze the waveform
+    waveform = fft.waveform();
+
+    // draw the shape of the waveform
+    drawWaveform();
+
+    drawText(modFreq, modAmp);
+  }
+}
+
+function drawWaveform() {
+  stroke(240);
+  strokeWeight(4);
+  beginShape();
+  for (let i = 0; i < waveform.length; i++) {
+    let x = map(i, 0, waveform.length, 0, width);
+    let y = map(waveform[i], -1, 1, -height / 2, height / 2);
+    vertex(x, y + height / 2);
+  }
+  endShape();
+}
+
+function drawText(modFreq, modAmp) {
+  strokeWeight(1);
+  text('Modulator Frequency: ' + modFreq.toFixed(3) + ' Hz', 20, 20);
+  text('Modulator Amplitude: ' + modAmp.toFixed(3), 20, 40);
+}
+
+function mousePressed() {
   carrier = new p5.Oscillator(); // connects to master output by default
   carrier.freq(340);
   carrier.amp(0);
@@ -55,41 +97,5 @@ function setup() {
 
   // create an fft to analyze the audio
   fft = new p5.FFT();
-}
-
-function draw() {
-  background(30, 30, 30, 100); // alpha
-
-  // map mouseY to moodulator freq between 0 and 20hz
-  let modFreq = map(mouseY, 0, height, 20, 0);
-  modulator.freq(modFreq);
-
-  let modAmp = map(mouseX, 0, width, 0, 1);
-  modulator.amp(modAmp, 0.01); // fade time of 0.1 for smooth fading
-
-  // analyze the waveform
-  waveform = fft.waveform();
-
-  // draw the shape of the waveform
-  drawWaveform();
-
-  drawText(modFreq, modAmp);
-}
-
-function drawWaveform() {
-  stroke(240);
-  strokeWeight(4);
-  beginShape();
-  for (let i = 0; i < waveform.length; i++) {
-    let x = map(i, 0, waveform.length, 0, width);
-    let y = map(waveform[i], -1, 1, -height / 2, height / 2);
-    vertex(x, y + height / 2);
-  }
-  endShape();
-}
-
-function drawText(modFreq, modAmp) {
-  strokeWeight(1);
-  text('Modulator Frequency: ' + modFreq.toFixed(3) + ' Hz', 20, 20);
-  text('Modulator Amplitude: ' + modAmp.toFixed(3), 20, 40);
+  audioStarted = true;
 }
